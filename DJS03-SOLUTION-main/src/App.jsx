@@ -1,71 +1,81 @@
 import { useEffect, useState } from "react";
 import PodcastGrid from "./components/PodcastGrid";
+import Pagination from "./components/Pagination";
 import { genres } from "./data";
 import { fetchPodcasts } from "./api/fetchPodcasts";
 import Header from "./components/Header";
 
 export default function App() {
   const [allPodcasts, setAllPodcasts] = useState([]); // full list
-  const [podcasts, setPodcasts] = useState([]);       // filtered + sorted list
+  const [filteredList, setFilteredList] = useState([]); // list after search/filter/sort
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [searchTerm, setSearchTerm] = useState("");   // search term
-  const [sortOption, setSortOption] = useState("latest"); // 'latest', 'az', or 'za'
-  const [genreFilter, setGenreFilter] = useState(""); // selected genre
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("latest"); // 'latest', 'az', 'za'
+  const [genreFilter, setGenreFilter] = useState("");
 
-  // Fetch podcasts on mount
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Fetch data once
   useEffect(() => {
     fetchPodcasts(
-      (data) => { 
+      (data) => {
         setAllPodcasts(data);
-        setPodcasts(data);
         setLoading(false);
-      }, 
-      setError, 
+      },
+      setError,
       setLoading
     );
   }, []);
 
-  // Apply all filters and sorting whenever any dependency changes
+  // Apply filtering + sorting whenever dependencies change
   useEffect(() => {
-    const filtered = applyFilters(allPodcasts, searchTerm, sortOption, genreFilter);
-    setPodcasts(filtered);
-  }, [searchTerm, sortOption, genreFilter, allPodcasts]);
+    const updated = applyFilters(allPodcasts, searchTerm, sortOption, genreFilter);
+    setFilteredList(updated);
+    setCurrentPage(1); // reset to first page whenever filter/search/sort changes
+  }, [allPodcasts, searchTerm, sortOption, genreFilter]);
 
-  // Helper function: handles search, genre filter, and sort
-  const applyFilters = (data, searchTerm, sortOption, genreFilter) => {
-    const term = searchTerm.trim().toLowerCase();
+  // Helper function
+  const applyFilters = (data, search, sortOpt, genre) => {
+    const term = search.trim().toLowerCase();
 
-    // Filter by search term
-    let filtered = data.filter(podcast =>
+    // 1. Filter by search
+    let result = data.filter(podcast =>
       podcast.title.toLowerCase().includes(term)
     );
 
-    // Filter by genre
-    if (genreFilter) {
-      filtered = filtered.filter(podcast => 
-        podcast.genres.includes(Number(genreFilter))
+    // 2. Filter by genre
+    if (genre) {
+      result = result.filter(podcast =>
+        podcast.genres.includes(Number(genre))
       );
     }
 
-    // Sort based on selected option
-    if (sortOption === "latest") {
-      filtered = [...filtered].sort(
+    // 3. Sort
+    if (sortOpt === "latest") {
+      result = [...result].sort(
         (a, b) => new Date(b.updated) - new Date(a.updated)
       );
-    } else if (sortOption === "az") {
-      filtered = [...filtered].sort((a, b) =>
+    } else if (sortOpt === "az") {
+      result = [...result].sort((a, b) =>
         a.title.localeCompare(b.title)
       );
-    } else if (sortOption === "za") {
-      filtered = [...filtered].sort((a, b) =>
+    } else if (sortOpt === "za") {
+      result = [...result].sort((a, b) =>
         b.title.localeCompare(a.title)
       );
     }
 
-    return filtered;
+    return result;
   };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentItems = filteredList.slice(indexOfFirst, indexOfLast);
 
   return (
     <>
@@ -82,7 +92,6 @@ export default function App() {
             <p>Loading podcasts...</p>
           </div>
         )}
-
         {error && (
           <div className="message-container">
             <div className="error">
@@ -90,11 +99,18 @@ export default function App() {
             </div>
           </div>
         )}
-
         {!loading && !error && (
-          <PodcastGrid podcasts={podcasts} genres={genres} />
+          <>
+            <PodcastGrid podcasts={currentItems} genres={genres} />
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </>
         )}
       </main>
     </>
   );
 }
+
