@@ -12,7 +12,9 @@ export default function App() {
 
   const [searchTerm, setSearchTerm] = useState("");   // search term
   const [sortOption, setSortOption] = useState("latest"); // 'latest', 'az', or 'za'
+  const [genreFilter, setGenreFilter] = useState(""); // selected genre
 
+  // Fetch podcasts on mount
   useEffect(() => {
     fetchPodcasts(
       (data) => { 
@@ -25,22 +27,29 @@ export default function App() {
     );
   }, []);
 
-  // Apply search + sort whenever related state changes
+  // Apply all filters and sorting whenever any dependency changes
   useEffect(() => {
-    const filtered = applyFilters(allPodcasts, searchTerm, sortOption);
+    const filtered = applyFilters(allPodcasts, searchTerm, sortOption, genreFilter);
     setPodcasts(filtered);
-  }, [searchTerm, sortOption, allPodcasts]);
+  }, [searchTerm, sortOption, genreFilter, allPodcasts]);
 
-  // Helper function
-  const applyFilters = (data, searchTerm, sortOption) => {
+  // Helper function: handles search, genre filter, and sort
+  const applyFilters = (data, searchTerm, sortOption, genreFilter) => {
     const term = searchTerm.trim().toLowerCase();
 
-    // 1️⃣ Filter
+    // Filter by search term
     let filtered = data.filter(podcast =>
       podcast.title.toLowerCase().includes(term)
     );
 
-    // 2️⃣ Sort
+    // Filter by genre
+    if (genreFilter) {
+      filtered = filtered.filter(podcast => 
+        podcast.genres.includes(Number(genreFilter))
+      );
+    }
+
+    // Sort based on selected option
     if (sortOption === "latest") {
       filtered = [...filtered].sort(
         (a, b) => new Date(b.updated) - new Date(a.updated)
@@ -60,7 +69,12 @@ export default function App() {
 
   return (
     <>
-      <Header onSearch={setSearchTerm} onSortChange={setSortOption} />
+      <Header
+        onSearch={setSearchTerm}
+        onSortChange={setSortOption}
+        onFilterChange={setGenreFilter}
+        genres={genres}
+      />
       <main>
         {loading && (
           <div className="message-container">
