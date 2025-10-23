@@ -1,11 +1,3 @@
-export default function Header() {
-  return (
-    <header className="app-header">
-      <h1>🎙️ Podcast App</h1>
-    </header>
-  );
-}
-
 import { useState } from "react";
 
 export default function Header({ onSearch }) {
@@ -14,7 +6,9 @@ export default function Header({ onSearch }) {
   const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);
-    onSearch(value); // notify parent as user types
+    if (onSearch) {
+      onSearch(value);
+    }
   };
 
   return (
