@@ -24,14 +24,11 @@ export default function App() {
     );
   }, []);
 
-  useEffect(() => {
-    // whenever searchTerm (or future filters/sorts) changes — apply filtering
-    const term = searchTerm.trim().toLowerCase();
-    const filtered = allPodcasts.filter(podcast =>
-      podcast.title.toLowerCase().includes(term)
-    );
-    setPodcasts(filtered);
-  }, [searchTerm, allPodcasts]);
+useEffect(() => {
+  const filtered = applyFilters(allPodcasts, searchTerm, sortOption);
+  setPodcasts(filtered);
+}, [searchTerm, sortOption, allPodcasts]);
+
 
   return (
     <>
