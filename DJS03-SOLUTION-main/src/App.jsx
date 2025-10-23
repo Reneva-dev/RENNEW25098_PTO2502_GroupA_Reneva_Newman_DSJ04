@@ -4,26 +4,38 @@ import { genres } from "./data";
 import { fetchPodcasts } from "./api/fetchPodcasts";
 import Header from "./components/Header";
 
-/**
- * App - The root component of the Podcast Explorer application. It handles:
- * - Fetching podcast data from a remote API
- * - Managing loading and error states
- * - Rendering the podcast grid once data is successfully fetched
- * - Displaying a header and fallback UI during loading or error
- * @returns {JSX.Element} The rendered application interface
- */
 export default function App() {
-  const [podcasts, setPodcasts] = useState([]);
+  const [allPodcasts, setAllPodcasts] = useState([]);      // full list
+  const [podcasts, setPodcasts] = useState([]);            // filtered list
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState("");        // new state for search
+
   useEffect(() => {
-    fetchPodcasts(setPodcasts, setError, setLoading);
+    fetchPodcasts(
+      (data) => { 
+        setAllPodcasts(data);
+        setPodcasts(data);
+        setLoading(false);
+      }, 
+      setError, 
+      setLoading
+    );
   }, []);
+
+  useEffect(() => {
+    // whenever searchTerm (or future filters/sorts) changes — apply filtering
+    const term = searchTerm.trim().toLowerCase();
+    const filtered = allPodcasts.filter(podcast =>
+      podcast.title.toLowerCase().includes(term)
+    );
+    setPodcasts(filtered);
+  }, [searchTerm, allPodcasts]);
 
   return (
     <>
-      <Header />
+      <Header onSearch={setSearchTerm} />
       <main>
         {loading && (
           <div className="message-container">
@@ -31,15 +43,13 @@ export default function App() {
             <p>Loading podcasts...</p>
           </div>
         )}
-
         {error && (
           <div className="message-container">
             <div className="error">
-              Error occurred while tyring fetching podcasts: {error}
+              Error occurred while trying fetching podcasts: {error}
             </div>
           </div>
         )}
-
         {!loading && !error && (
           <PodcastGrid podcasts={podcasts} genres={genres} />
         )}
