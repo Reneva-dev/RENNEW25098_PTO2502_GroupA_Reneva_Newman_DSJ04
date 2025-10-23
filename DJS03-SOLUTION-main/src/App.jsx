@@ -56,4 +56,33 @@ export default function App() {
       </main>
     </>
   );
+
+  const [sortOption, setSortOption] = useState("latest"); // 'latest', 'az', or 'za'
+
+// this function applies sorting after search/filter
+const applyFilters = (data, searchTerm, sortOption) => {
+  const term = searchTerm.trim().toLowerCase();
+
+  // 1️⃣ Filter by search term
+  let filtered = data.filter(podcast =>
+    podcast.title.toLowerCase().includes(term)
+  );
+
+  // 2️⃣ Sort based on selected option
+  if (sortOption === "latest") {
+    filtered = [...filtered].sort(
+      (a, b) => new Date(b.updated) - new Date(a.updated)
+    );
+  } else if (sortOption === "az") {
+    filtered = [...filtered].sort((a, b) =>
+      a.title.localeCompare(b.title)
+    );
+  } else if (sortOption === "za") {
+    filtered = [...filtered].sort((a, b) =>
+      b.title.localeCompare(a.title)
+    );
+  }
+
+  return filtered;
+};
 }
