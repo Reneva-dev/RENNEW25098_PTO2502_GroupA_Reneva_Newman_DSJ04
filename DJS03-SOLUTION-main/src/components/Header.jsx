@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Header({ onSearch }) {
+export default function Header({ onSearch, onSortChange }) {
   const [query, setQuery] = useState("");
 
   const handleChange = (e) => {
