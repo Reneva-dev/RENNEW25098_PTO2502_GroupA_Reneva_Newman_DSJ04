@@ -1,5 +1,17 @@
 import { useState } from "react";
 
+/**
+ * Header component rendering the app title, search input, genre filter dropdown and sort dropdown.
+ *
+ * @component
+ * @param {Object} props
+ * @param {function(string): void} props.onSearch - Callback invoked when the search term changes.
+ * @param {function(string): void} props.onFilterChange - Callback invoked when the selected genre changes.
+ * @param {function(string): void} props.onSortChange - Callback invoked when the sort option changes.
+ * @param {Array<{ id: number, title: string }>} props.genres - List of available genres to filter by.
+ * @returns {JSX.Element} The rendered header element.
+ */
+
 export default function Header({ onSearch, onSortChange, onFilterChange, genres }) {
   const [query, setQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
