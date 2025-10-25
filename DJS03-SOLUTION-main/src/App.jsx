@@ -5,6 +5,15 @@ import { genres } from "./data";
 import { fetchPodcasts } from "./api/fetchPodcasts";
 import Header from "./components/Header";
 
+/**
+ * Root component of the Podcast Explorer application.
+ * Handles fetching podcast data, search, filter, sort, pagination logic and rendering.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered application interface.
+ */
+
+
 export default function App() {
   const [allPodcasts, setAllPodcasts] = useState([]); // full list
   const [filteredList, setFilteredList] = useState([]); // list after search/filter/sort
