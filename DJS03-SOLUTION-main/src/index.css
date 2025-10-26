@@ -1,19 +1,64 @@
 :root {
   --grey-text: #555;
+  --primary-color: #4a90e2;          /* primary accent */
+  --primary-hover: #357ab8;
+  --bg-light: #f9f9f9;
+  --bg-white: #fff;
+  --border-light: #ddd;
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-primary: rgba(74, 144, 226, 0.35);
 }
 
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
-  background: #f9f9f9;
+  background-color: var(--bg-light);
+  color: #333;
 }
 
 .app-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem;
-  background: white;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-white);
+  box-shadow: 0 1px 5px var(--shadow-light);
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.header-controls input[type="text"],
+.header-controls select {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.6rem;
+  background-color: var(--bg-white);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.header-controls input[type="text"]:focus,
+.header-controls select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem var(--shadow-primary);
+  outline: none;
+}
+
+.header-controls input[type="text"] {
+  padding-left: 2.5rem; /* for icon if you add one */
+  background-image: url('/icons/search.svg'); /* optional search icon */
+  background-repeat: no-repeat;
+  background-position: 0.75rem center;
+  background-size: 1rem;
+}
+
+.header-controls select:hover {
+  border-color: var(--border-light);
 }
 
 .grid {
@@ -24,16 +69,17 @@ body {
 }
 
 .card {
-  background: white;
+  background-color: var(--bg-white);
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px var(--shadow-light);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
   transform: scale(1.02);
+  box-shadow: 0 4px 12px var(--shadow-light);
 }
 
 .card img {
@@ -46,7 +92,7 @@ body {
 }
 
 .card p {
-  margin: 0px;
+  margin: 0;
   font-size: 0.8rem;
   color: var(--grey-text);
 }
@@ -56,7 +102,7 @@ body {
 }
 
 .tag {
-  background: #eee;
+  background-color: #eee;
   padding: 0.3rem 0.6rem;
   margin-right: 0.5rem;
   margin-top: 0.5rem;
@@ -81,7 +127,7 @@ body {
   width: 40px;
   height: 40px;
   border: 4px solid #ccc;
-  border-top: 4px solid #4a90e2;
+  border-top: 4px solid var(--primary-color);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 0.5rem;
@@ -104,3 +150,40 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.pagination button {
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 0.4rem;
+  background-color: #f0f0f0;
+  color: #444;
+  transition: background-color 0.3s, transform 0.1s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pagination button.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 2px 6px var(--shadow-primary);
+}
+
